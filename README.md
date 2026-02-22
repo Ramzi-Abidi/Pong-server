@@ -1,6 +1,6 @@
 # Pong Online Multiplayer Server
 
-Backend server for real-time multiplayer Pong game using Socket.io and Node.js.
+Backend server for real-time multiplayer Pong game using Socket.io and Node.
 
 ## Features
 
