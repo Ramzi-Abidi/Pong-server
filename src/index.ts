@@ -2,20 +2,29 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import cors from 'cors';
-import { Room, GameState } from './types';
+import { Room } from './types';
 import { createInitialGameState, updateGameState } from './gameLogic';
 import { GAME_CONFIG } from './constants';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+const allowedOrigins = (process.env.CORS_ORIGINS ?? '*')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+const corsOrigin: string | string[] = allowedOrigins.includes('*')
+  ? '*'
+  : allowedOrigins;
+
 const app = express();
-app.use(cors());
+app.use(cors({ origin: corsOrigin, methods: ['GET', 'POST'] }));
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: '*', // For development, allow all. In production, restrict to your Netlify domain.
+    origin: corsOrigin,
     methods: ['GET', 'POST'],
   },
 });
@@ -100,8 +109,7 @@ io.on('connection', (socket: Socket) => {
     room.players[socket.id].ready = true;
 
     // Check if both players are ready
-    const allPlayersReady = Object.values(room.players).length === 2 && 
-                           Object.values(room.players).every(p => p.ready);
+    const allPlayersReady = Object.values(room.players).length === 2 && Object.values(room.players).every(p => p.ready);
 
     io.to(roomCode).emit('player_ready_status', { 
       players: Object.values(room.players)
