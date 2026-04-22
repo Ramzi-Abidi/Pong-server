@@ -9,22 +9,13 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const allowedOrigins = (process.env.CORS_ORIGINS ?? '*')
-  .split(',')
-  .map((o) => o.trim())
-  .filter(Boolean);
-
-const corsOrigin: string | string[] = allowedOrigins.includes('*')
-  ? '*'
-  : allowedOrigins;
-
 const app = express();
-app.use(cors());
+app.use(cors({ origin: '*' }));
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: corsOrigin,
+    origin: '*',
     methods: ['GET', 'POST'],
   },
 });
