@@ -19,7 +19,7 @@ const corsOrigin: string | string[] = allowedOrigins.includes('*')
   : allowedOrigins;
 
 const app = express();
-app.use(cors({ origin: corsOrigin, methods: ['GET', 'POST'] }));
+app.use(cors());
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -33,6 +33,10 @@ const PORT = process.env.PORT || 3001;
 
 // In-memory store for rooms
 const rooms = new Map<string, Room>();
+
+app.get('/', (_req, res) => {
+  res.json({ status: 'ok', service: 'pong-server', rooms: rooms.size });
+});
 
 const generateRoomCode = () => {
   return Math.random().toString(36).substring(2, 6).toUpperCase();
